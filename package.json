@@ -4,6 +4,7 @@
   "description": "Copy a file plus the local files it imports to the clipboard as a single prompt-ready block for ChatGPT, Claude, Gemini and friends.",
   "version": "0.1.0",
   "publisher": "evanshareef",
+  "icon": "images/icon.png",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -116,5 +117,9 @@
   },
   "overrides": {
     "@azure/msal-node": "^7.0.3"
+  },
+  "galleryBanner": {
+    "color": "#1E1B4B",
+    "theme": "dark"
   }
 }
