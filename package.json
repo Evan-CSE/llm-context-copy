@@ -2,7 +2,7 @@
   "name": "import-context-copy",
   "displayName": "Import Context Copy",
   "description": "Copy a file plus the local files it imports to the clipboard as a single prompt-ready block for ChatGPT, Claude, Gemini and friends.",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "publisher": "evanshareef",
   "icon": "images/icon.png",
   "license": "MIT",
@@ -42,6 +42,11 @@
         "command": "llmContextCopy.copyPick",
         "title": "Copy with Imports as LLM Context (Choose Files...)",
         "category": "LLM Context"
+      },
+      {
+        "command": "llmContextCopy.copyBlock",
+        "title": "Copy Block with Dependencies as LLM Context",
+        "category": "LLM Context"
       }
     ],
     "menus": {
@@ -61,6 +66,10 @@
         {
           "command": "llmContextCopy.copy",
           "group": "9_cutcopypaste@9"
+        },
+        {
+          "command": "llmContextCopy.copyBlock",
+          "group": "9_cutcopypaste@10"
         }
       ],
       "editor/title/context": [
@@ -98,6 +107,24 @@
           ],
           "default": "markdown",
           "description": "Output format for the copied context."
+        },
+        "llmContextCopy.blockDepth": {
+          "type": "integer",
+          "default": 3,
+          "minimum": 1,
+          "maximum": 10,
+          "description": "For \"Copy Block with Dependencies\": how many levels of function/type dependencies to follow."
+        },
+        "llmContextCopy.maxSnippets": {
+          "type": "integer",
+          "default": 40,
+          "minimum": 1,
+          "description": "For \"Copy Block with Dependencies\": maximum number of code blocks to include."
+        },
+        "llmContextCopy.includeImplementations": {
+          "type": "boolean",
+          "default": true,
+          "description": "For \"Copy Block with Dependencies\": when code calls a method through an interface, also include up to 3 implementations."
         }
       }
     }

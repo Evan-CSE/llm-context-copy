@@ -2,7 +2,9 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { collect, CollectedFile } from './resolver';
-import { estimateTokens, format, OutputFormat } from './format';
+import { estimateTokens, format, formatSnippets, OutputFormat } from './format';
+import { chainAt, pickRoot, qualifiedName, Rng } from './slice';
+import { sliceDependencies, SymbolCache } from './symbols';
 
 function targetUris(uri?: vscode.Uri, uris?: vscode.Uri[]): vscode.Uri[] {
   if (uris && uris.length > 0) {
@@ -82,6 +84,67 @@ async function run(pick: boolean, uri?: vscode.Uri, uris?: vscode.Uri[]): Promis
   );
 }
 
+async function runBlock(): Promise<void> {
+  const editor = vscode.window.activeTextEditor;
+  if (!editor || editor.document.uri.scheme !== 'file') {
+    vscode.window.showWarningMessage('Import Context Copy: open a file and place the cursor in a function first.');
+    return;
+  }
+  const doc = editor.document;
+  const symbols = new SymbolCache();
+
+  // A selection wins; otherwise use the function/method/class/interface under the cursor.
+  let range: Rng;
+  let name: string;
+  if (!editor.selection.isEmpty) {
+    const s = editor.selection;
+    range = { start: { line: s.start.line, character: 0 }, end: { line: s.end.line, character: s.end.character } };
+    name = 'selection';
+  } else {
+    const p = editor.selection.active;
+    const chain = chainAt(await symbols.get(doc.uri), { line: p.line, character: p.character });
+    const root = pickRoot(chain);
+    if (!root) {
+      vscode.window.showWarningMessage('Import Context Copy: put the cursor inside a function, class or interface, or select some code.');
+      return;
+    }
+    range = root.range;
+    name = qualifiedName(chain, root);
+  }
+
+  const config = vscode.workspace.getConfiguration('llmContextCopy');
+  const result = await vscode.window.withProgress(
+    { location: vscode.ProgressLocation.Window, title: 'Collecting dependencies…', cancellable: false },
+    () =>
+      sliceDependencies(doc, range, name, {
+        maxDepth: config.get<number>('blockDepth', 3),
+        maxSnippets: config.get<number>('maxSnippets', 40),
+        includeImplementations: config.get<boolean>('includeImplementations', true),
+      }, symbols),
+  );
+
+  const root = rootFor(doc.uri);
+  const text = formatSnippets(
+    result.snippets.map((s) => ({ file: s.file, startLine: s.range.start.line, endLine: s.range.end.line, name: s.name, text: s.text })),
+    root,
+    config.get<OutputFormat>('format', 'markdown'),
+  );
+  await vscode.env.clipboard.writeText(text);
+
+  const files = new Set(result.snippets.map((s) => s.file)).size;
+  vscode.window.setStatusBarMessage(
+    `$(clippy) Copied ${result.snippets.length} block(s) from ${files} file(s), ~${estimateTokens(text).toLocaleString()} tokens`,
+    5000,
+  );
+  if (!result.providerFound) {
+    vscode.window.showInformationMessage(
+      `Import Context Copy: no definitions were found for ${doc.languageId}, so only the block itself was copied. ` +
+        'If the language server is still starting, try again in a few seconds; otherwise install the language ' +
+        'extension (e.g. Python) to include dependencies.',
+    );
+  }
+}
+
 export function activate(context: vscode.ExtensionContext): void {
   context.subscriptions.push(
     vscode.commands.registerCommand('llmContextCopy.copy', (uri?: vscode.Uri, uris?: vscode.Uri[]) =>
@@ -90,6 +153,7 @@ export function activate(context: vscode.ExtensionContext): void {
     vscode.commands.registerCommand('llmContextCopy.copyPick', (uri?: vscode.Uri, uris?: vscode.Uri[]) =>
       run(true, uri, uris),
     ),
+    vscode.commands.registerCommand('llmContextCopy.copyBlock', () => runBlock()),
   );
 }
 

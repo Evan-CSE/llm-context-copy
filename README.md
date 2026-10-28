@@ -17,6 +17,29 @@ Unsaved editor changes are included.
 
 ![Choose which files to include](images/demo-pick.gif)
 
+### Copy just a function and what it uses
+
+Right-click **inside a function** (or select some lines) in the editor and choose **Copy Block with Dependencies as LLM Context**. Instead of whole files, you get only that block plus the functions, types and constants it actually uses, followed recursively:
+
+```python
+def calculate(a, b):          # right-click here
+    total = add(a, b)         # -> copies add()
+    diff = sub(a, b)          # -> copies sub(), and scale() which sub() calls
+    return total * diff
+```
+
+| The block uses… | What gets copied |
+|---|---|
+| a function or method | just that function or method |
+| a field or type of an interface, type alias or enum | the whole interface, type alias or enum |
+| a method called through an interface (`rule.apply(m)`) | the interface **and** its implementations (up to 3) |
+| a top-level constant or object | that declaration |
+| locals, parameters, `node_modules`, `site-packages`, the standard library | nothing |
+
+Each snippet is labelled with its file, line range and name (e.g. `src/rules.ts:4-6 · ZakatRule.apply`).
+
+It uses VS Code's language servers, so it works for TypeScript/JavaScript out of the box and for Python, Go, Java, C# and others when their language extension is installed. If you use it right after opening a project, give the language server a few seconds to start.
+
 ### Output
 
 ````markdown
@@ -49,6 +72,9 @@ Imports are followed breadth-first, so the closest dependencies come first. Cycl
 | `llmContextCopy.maxDepth` | `2` | Levels of imports to follow (`0` = selected files only) |
 | `llmContextCopy.maxFiles` | `30` | Maximum files included |
 | `llmContextCopy.format` | `markdown` | `markdown` or `xml` |
+| `llmContextCopy.blockDepth` | `3` | Copy Block: levels of dependencies to follow |
+| `llmContextCopy.maxSnippets` | `40` | Copy Block: maximum code blocks included |
+| `llmContextCopy.includeImplementations` | `true` | Copy Block: include implementations of interface methods that are called |
 
 ## Limitations (v0.1)
 
