@@ -1,6 +1,6 @@
-# LLM Context Copy
+# Import Context Copy
 
-Pasting one file into ChatGPT, Claude or Gemini usually isn't enough, because the model also needs the types, helpers and config that file imports. **LLM Context Copy** gathers the file plus the local files it imports and puts them all on your clipboard as one prompt-ready block.
+Pasting one file into ChatGPT, Claude or Gemini usually isn't enough, because the model also needs the types, helpers and config that file imports. **Import Context Copy** gathers the file plus the local files it imports and puts them all on your clipboard as one prompt-ready block.
 
 ## Usage
 

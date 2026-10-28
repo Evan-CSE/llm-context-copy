@@ -1,6 +1,6 @@
 {
-  "name": "llm-context-copy",
-  "displayName": "LLM Context Copy",
+  "name": "import-context-copy",
+  "displayName": "Import Context Copy",
   "description": "Copy a file plus the local files it imports to the clipboard as a single prompt-ready block for ChatGPT, Claude, Gemini and friends.",
   "version": "0.1.0",
   "publisher": "evanshareef",
@@ -71,7 +71,7 @@
       ]
     },
     "configuration": {
-      "title": "LLM Context Copy",
+      "title": "Import Context Copy",
       "properties": {
         "llmContextCopy.maxDepth": {
           "type": "integer",

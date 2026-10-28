@@ -39,7 +39,7 @@ function readPreferringOpenDocs(filePath: string): string | undefined {
 async function run(pick: boolean, uri?: vscode.Uri, uris?: vscode.Uri[]): Promise<void> {
   const targets = targetUris(uri, uris).filter((u) => u.scheme === 'file');
   if (targets.length === 0) {
-    vscode.window.showWarningMessage('LLM Context Copy: open or select a file first.');
+    vscode.window.showWarningMessage('Import Context Copy: open or select a file first.');
     return;
   }
 
