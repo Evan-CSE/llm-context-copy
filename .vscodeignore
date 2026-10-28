@@ -6,3 +6,4 @@ out/test/**
 tsconfig.json
 .gitignore
 node_modules/**
+images/demo-*.gif

@@ -58,7 +58,7 @@ async function run(pick: boolean, uri?: vscode.Uri, uris?: vscode.Uri[]): Promis
   if (pick && files.length > 1) {
     const items = files.map((f) => ({
       label: path.basename(f.path),
-      description: path.relative(root, f.path),
+      description: path.relative(root, f.path).split(path.sep).join('/'),
       detail: f.depth === 0 ? 'selected file' : `import depth ${f.depth} · ~${estimateTokens(f.content)} tokens`,
       picked: true,
       file: f,

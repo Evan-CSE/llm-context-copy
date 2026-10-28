@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.1
+
+- Explorer menu: both commands now sit together in their own section instead of being interleaved with Copy Path / Copy Relative Path.
+- File picker shows paths with forward slashes on Windows, matching the copied output.
+
 ## 0.1.0
 
 - Initial release: copy a file (or several) plus its local imports as LLM context.

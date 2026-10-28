@@ -2,7 +2,7 @@
   "name": "import-context-copy",
   "displayName": "Import Context Copy",
   "description": "Copy a file plus the local files it imports to the clipboard as a single prompt-ready block for ChatGPT, Claude, Gemini and friends.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "publisher": "evanshareef",
   "icon": "images/icon.png",
   "license": "MIT",
@@ -49,12 +49,12 @@
         {
           "command": "llmContextCopy.copy",
           "when": "!explorerResourceIsFolder",
-          "group": "6_copypath@9"
+          "group": "6_llmcontext@1"
         },
         {
           "command": "llmContextCopy.copyPick",
           "when": "!explorerResourceIsFolder",
-          "group": "6_copypath@10"
+          "group": "6_llmcontext@2"
         }
       ],
       "editor/context": [

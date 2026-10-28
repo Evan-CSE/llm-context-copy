@@ -2,6 +2,8 @@
 
 Pasting one file into ChatGPT, Claude or Gemini usually isn't enough, because the model also needs the types, helpers and config that file imports. **Import Context Copy** gathers the file plus the local files it imports and puts them all on your clipboard as one prompt-ready block.
 
+![Right-click a file and copy it with its imports](images/demo-copy.gif)
+
 ## Usage
 
 Right-click a file (or several) in the Explorer, or right-click inside an editor:
@@ -12,6 +14,8 @@ Right-click a file (or several) in the Explorer, or right-click inside an editor
 Both commands are also in the Command Palette under `LLM Context:`. The status bar shows how many files were copied and a rough token count.
 
 Unsaved editor changes are included.
+
+![Choose which files to include](images/demo-pick.gif)
 
 ### Output
 
