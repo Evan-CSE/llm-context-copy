@@ -171,7 +171,33 @@ export function dropContained<T extends Snippet>(snippets: T[]): T[] {
   );
 }
 
-const EXCLUDED_DIRS = ['node_modules', 'site-packages', 'dist-packages', '.venv', 'venv', 'typeshed', 'lib.d.ts'];
+/**
+ * Moves a block's first line up over the comments, JSDoc and decorators directly above it,
+ * which language servers leave out of a symbol's range but which often explain the code.
+ */
+export function leadingCommentStart(lines: string[], startLine: number): number {
+  let line = startLine;
+  let inBlock = false;
+  while (line > 0) {
+    const t = lines[line - 1].trim();
+    if (inBlock) {
+      line--;
+      if (t.startsWith('/*')) {
+        inBlock = false;
+      }
+    } else if (t.endsWith('*/') && !t.startsWith('/*')) {
+      inBlock = true; // end of a multi-line block comment; walk up to its start
+      line--;
+    } else if (t.startsWith('//') || t.startsWith('#') || t.startsWith('@') || (t.startsWith('/*') && t.endsWith('*/'))) {
+      line--;
+    } else {
+      break;
+    }
+  }
+  return line;
+}
+
+const EXCLUDED_DIRS =['node_modules', 'site-packages', 'dist-packages', '.venv', 'venv', 'typeshed', 'lib.d.ts'];
 
 export function isLibraryPath(filePath: string): boolean {
   const parts = filePath.split(/[\\/]/);

@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.1
+
+- Copy Block with Dependencies now includes the comments, doc comments and decorators directly above each copied definition.
+- README: demo GIF for Copy Block, a full limitations section, privacy note, and badges.
+
 ## 0.2.0
 
 - New: **Copy Block with Dependencies as LLM Context** (editor right-click). Copies the function, class or interface at the cursor (or the selected lines) plus only the functions, types and constants it uses, recursively, instead of whole files.

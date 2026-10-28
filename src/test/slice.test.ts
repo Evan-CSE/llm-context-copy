@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import * as assert from 'node:assert/strict';
-import { chainAt, dropContained, identifierRefs, isLibraryPath, Kind, pickDependency, pickRoot, qualifiedName, Sym } from '../slice';
+import { chainAt, dropContained, identifierRefs, isLibraryPath, Kind, leadingCommentStart, pickDependency, pickRoot, qualifiedName, Sym } from '../slice';
 
 const sym = (name: string, kind: Kind, l1: number, l2: number): Sym => ({
   name, kind,
@@ -90,4 +90,15 @@ test('qualifiedName prefixes methods with their class or interface', () => {
   assert.equal(qualifiedName([cls, method], method), 'ZakatRule.apply');
   const fn = sym('round', Kind.Function, 12, 14);
   assert.equal(qualifiedName([fn], fn), 'round');
+});
+
+test('leadingCommentStart takes comments, JSDoc and decorators directly above, stopping at code or blank lines', () => {
+  const ts = ['import x from "y";', '', '/**', ' * Adds.', ' */', '// note', 'export function add() {}'];
+  assert.equal(leadingCommentStart(ts, 6), 2);
+  const py = ['x = 1', '# Hanafi Asr', '@cache', 'def asr():', '    pass'];
+  assert.equal(leadingCommentStart(py, 3), 1);
+  const none = ['const a = 1;', 'function b() {}'];
+  assert.equal(leadingCommentStart(none, 1), 1);
+  const blankGap = ['// unrelated', '', 'function c() {}'];
+  assert.equal(leadingCommentStart(blankGap, 2), 2);
 });

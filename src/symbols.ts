@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import {
-  chainAt, dropContained, qualifiedName, identifierRefs, isLibraryPath, Kind, pickDependency, Rng, Snippet, Sym,
+  chainAt, dropContained, leadingCommentStart, qualifiedName, identifierRefs, isLibraryPath, Kind, pickDependency, Rng, Snippet, Sym,
   containsPos, containsRange,
 } from './slice';
 
@@ -28,10 +28,12 @@ const toRng = (r: vscode.Range): Rng => ({
 
 const toRange = (r: Rng) => new vscode.Range(r.start.line, r.start.character, r.end.line, r.end.character);
 
-/** Expands a range to whole lines so snippets keep their indentation. */
-function fullLines(doc: vscode.TextDocument, r: Rng): Rng {
+/** Expands a range to whole lines so snippets keep their indentation, optionally taking leading comments/decorators. */
+function fullLines(doc: vscode.TextDocument, r: Rng, withComments = false): Rng {
   const endLine = r.end.character === 0 && r.end.line > r.start.line ? r.end.line - 1 : r.end.line;
-  return { start: { line: r.start.line, character: 0 }, end: { line: endLine, character: doc.lineAt(endLine).text.length } };
+  const lines = withComments ? Array.from({ length: r.start.line }, (_, k) => doc.lineAt(k).text) : [];
+  const startLine = withComments ? leadingCommentStart(lines, r.start.line) : r.start.line;
+  return { start: { line: startLine, character: 0 }, end: { line: endLine, character: doc.lineAt(endLine).text.length } };
 }
 
 function flatten(items: (vscode.DocumentSymbol | vscode.SymbolInformation)[] | undefined): Sym[] {
@@ -102,9 +104,11 @@ export async function sliceDependencies(
   opts: SliceOptions,
   symbols = new SymbolCache(),
 ): Promise<SliceResult> {
+  // A hand-made selection is copied exactly; a whole symbol also gets its doc comment/decorators.
+  const isSelection = rootName === 'selection';
   const root: CodeSnippet = {
-    file: rootDoc.uri.fsPath, range: fullLines(rootDoc, rootRange), name: rootName, depth: 0,
-    text: rootDoc.getText(toRange(fullLines(rootDoc, rootRange))),
+    file: rootDoc.uri.fsPath, range: fullLines(rootDoc, rootRange, !isSelection), name: rootName, depth: 0,
+    text: rootDoc.getText(toRange(fullLines(rootDoc, rootRange, !isSelection))),
   };
   const snippets: CodeSnippet[] = [root];
   const key = (file: string, r: Rng) => `${file}#${r.start.line}:${r.start.character}`;
@@ -154,7 +158,7 @@ export async function sliceDependencies(
           if (!seen.has(depKey) && !covered(uri.fsPath, { start: at, end: at })) {
             seen.add(depKey);
             const depDoc = await vscode.workspace.openTextDocument(uri);
-            const range = fullLines(depDoc, dep.range);
+            const range = fullLines(depDoc, dep.range, true);
             const depSnip: CodeSnippet = { file: uri.fsPath, range, name: qualifiedName(chain, dep), depth, text: depDoc.getText(toRange(range)) };
             snippets.push(depSnip);
             next.push({ doc: depDoc, snip: depSnip });
@@ -178,7 +182,7 @@ export async function sliceDependencies(
               }
               seen.add(key(iUri.fsPath, iDep.range));
               const iDoc = await vscode.workspace.openTextDocument(iUri);
-              const iRange = fullLines(iDoc, iDep.range);
+              const iRange = fullLines(iDoc, iDep.range, true);
               const iSnip: CodeSnippet = { file: iUri.fsPath, range: iRange, name: qualifiedName(iChain, iDep), depth, text: iDoc.getText(toRange(iRange)) };
               snippets.push(iSnip);
               next.push({ doc: iDoc, snip: iSnip });

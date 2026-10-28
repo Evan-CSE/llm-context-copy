@@ -1,8 +1,8 @@
 {
   "name": "import-context-copy",
   "displayName": "Import Context Copy",
-  "description": "Copy a file plus the local files it imports to the clipboard as a single prompt-ready block for ChatGPT, Claude, Gemini and friends.",
-  "version": "0.2.0",
+  "description": "Copy code as prompt-ready context for ChatGPT, Claude or Gemini: a file plus the local files it imports, or just a function plus the functions and types it uses.",
+  "version": "0.2.1",
   "publisher": "evanshareef",
   "icon": "images/icon.png",
   "license": "MIT",
@@ -23,12 +23,17 @@
   ],
   "keywords": [
     "llm",
+    "ai",
     "chatgpt",
     "claude",
+    "gemini",
+    "prompt",
     "context",
+    "copy",
     "clipboard",
     "imports",
-    "prompt"
+    "dependencies",
+    "function"
   ],
   "main": "./out/extension.js",
   "contributes": {
