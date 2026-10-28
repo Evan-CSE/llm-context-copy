@@ -1,0 +1,109 @@
+{
+  "name": "llm-context-copy",
+  "displayName": "LLM Context Copy",
+  "description": "Copy a file plus the local files it imports to the clipboard as a single prompt-ready block for ChatGPT, Claude, Gemini and friends.",
+  "version": "0.1.0",
+  "publisher": "evanshareef",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other",
+    "AI"
+  ],
+  "keywords": [
+    "llm",
+    "chatgpt",
+    "claude",
+    "context",
+    "clipboard",
+    "imports",
+    "prompt"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "llmContextCopy.copy",
+        "title": "Copy with Imports as LLM Context",
+        "category": "LLM Context"
+      },
+      {
+        "command": "llmContextCopy.copyPick",
+        "title": "Copy with Imports as LLM Context (Choose Files...)",
+        "category": "LLM Context"
+      }
+    ],
+    "menus": {
+      "explorer/context": [
+        {
+          "command": "llmContextCopy.copy",
+          "when": "!explorerResourceIsFolder",
+          "group": "6_copypath@9"
+        },
+        {
+          "command": "llmContextCopy.copyPick",
+          "when": "!explorerResourceIsFolder",
+          "group": "6_copypath@10"
+        }
+      ],
+      "editor/context": [
+        {
+          "command": "llmContextCopy.copy",
+          "group": "9_cutcopypaste@9"
+        }
+      ],
+      "editor/title/context": [
+        {
+          "command": "llmContextCopy.copy",
+          "group": "1_cutcopypaste@9"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "LLM Context Copy",
+      "properties": {
+        "llmContextCopy.maxDepth": {
+          "type": "integer",
+          "default": 2,
+          "minimum": 0,
+          "maximum": 10,
+          "description": "How many levels of local imports to follow. 0 copies only the selected files."
+        },
+        "llmContextCopy.maxFiles": {
+          "type": "integer",
+          "default": 30,
+          "minimum": 1,
+          "description": "Maximum number of files to include."
+        },
+        "llmContextCopy.format": {
+          "type": "string",
+          "enum": [
+            "markdown",
+            "xml"
+          ],
+          "enumDescriptions": [
+            "Each file as a heading plus a fenced code block.",
+            "Each file wrapped in <file path=\"...\"> tags (works well with Claude)."
+          ],
+          "default": "markdown",
+          "description": "Output format for the copied context."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "compile": "tsc -p .",
+    "watch": "tsc -watch -p .",
+    "test": "npm run compile && node --test \"out/test/**/*.test.js\"",
+    "vscode:prepublish": "npm run compile",
+    "package": "vsce package"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/vscode": "~1.85.0",
+    "@vscode/vsce": "^3.0.0",
+    "typescript": "~5.9.3"
+  }
+}
