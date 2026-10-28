@@ -5,6 +5,14 @@
   "version": "0.1.0",
   "publisher": "evanshareef",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Evan-CSE/llm-context-copy.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Evan-CSE/llm-context-copy/issues"
+  },
+  "homepage": "https://github.com/Evan-CSE/llm-context-copy#readme",
   "engines": {
     "vscode": "^1.85.0"
   },
